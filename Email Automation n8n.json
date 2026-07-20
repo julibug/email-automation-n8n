@@ -1,0 +1,637 @@
+{
+  "name": "Email Automation n8n",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -368,
+        -32
+      ],
+      "id": "91268fb0-d34d-4b04-a099-bdcfd54b3fb7",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Z9K9MpDgT01fWE9i",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.snippet }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "Work",
+              "description": "Job offers"
+            },
+            {
+              "category": "Packages",
+              "description": "Information about shipments"
+            },
+            {
+              "category": "Personal",
+              "description": "Personal inbox"
+            }
+          ]
+        },
+        "options": {
+          "fallback": "other",
+          "systemPromptTemplate": "Please classify the text provided by the user into one of the following categories: {Work, Packages, Personal}, and use the provided formatting instructions below. Don't explain, and only output the json."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        -80
+      ],
+      "id": "88cd7523-5724-42a7-81b3-93afd73a5d0b",
+      "name": "Email Classifier"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        160,
+        208
+      ],
+      "id": "cd87acec-2352-42f4-b04e-93dbc998274d",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "7N70jPXIc0aUWMuq",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_510265366050654455"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        432,
+        -368
+      ],
+      "id": "f2b28385-3720-479e-b9ec-7a15f86673a1",
+      "name": "Add label to message",
+      "webhookId": "d56681d9-dc7b-4230-8fb5-a4d7aecdff25",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Z9K9MpDgT01fWE9i",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_1589639016007271256"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        432,
+        -176
+      ],
+      "id": "a5d67466-0046-494b-b929-b914d3d287ed",
+      "name": "Add label to message1",
+      "webhookId": "59e0116c-f798-4f3e-b000-c41c73aef3fa",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Z9K9MpDgT01fWE9i",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_1743487504010291110"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        432,
+        16
+      ],
+      "id": "cc8f2680-3034-4d1f-b631-86fb81ce0147",
+      "name": "Add label to message2",
+      "webhookId": "ab5b7837-b71d-4934-a45e-3ccbc6f69854",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Z9K9MpDgT01fWE9i",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_5092774189401487892"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        432,
+        208
+      ],
+      "id": "f9df3fa1-4e6e-4d7c-b21e-63690dc28676",
+      "name": "Add label to message3",
+      "webhookId": "0ea54116-24c9-4247-b42f-05a25c4606c2",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Z9K9MpDgT01fWE9i",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are drafting an email reply on behalf of the user.\n\nWrite ONLY the body of the reply. Do not include:\n- any preamble, commentary or explanation\n- a subject line\n- markdown formatting or separators\n\nMatch the writing style of the previous emails: direct, concise, professional.\nWrite in the same language as the incoming email.\n\nIncoming email\nSubject: {{ $('Gmail Trigger').item.json.Subject }}\nBody: {{ $('Gmail Trigger').item.json.snippet }}\n\nOutput: the reply body text only.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        656,
+        16
+      ],
+      "id": "d0b1135d-5db6-4b4e-8337-f04768feded9",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        240
+      ],
+      "id": "292e7690-16dd-4cde-9e91-143f8dba4c51",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "7N70jPXIc0aUWMuq",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 3,
+        "filters": {
+          "labelIds": [
+            "SENT"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        800,
+        240
+      ],
+      "id": "730849a6-e3a0-487a-aa72-51d843d4e507",
+      "name": "Get many messages in Gmail",
+      "webhookId": "2364139e-62ea-40e4-b830-9c835bb2079e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Z9K9MpDgT01fWE9i",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "=Re: {{ $('Gmail Trigger').item.json.Subject }}",
+        "message": "={{ $json.output }}",
+        "options": {
+          "threadId": "={{ $('Gmail Trigger').item.json.threadId }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1008,
+        16
+      ],
+      "id": "0b0350e8-1d2f-47ef-af03-e1cca70f6f59",
+      "name": "Create a draft",
+      "webhookId": "78b9e7d3-8127-468b-8c0c-4703827d138a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Z9K9MpDgT01fWE9i",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "appToken",
+        "email": "={{ $('Gmail Trigger').item.json.From.includes('<') ? $('Gmail Trigger').item.json.From.split('<')[1].split('>')[0].trim() : $('Gmail Trigger').item.json.From.trim() }}",
+        "additionalFields": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2.2,
+      "position": [
+        720,
+        -368
+      ],
+      "id": "c4195f5a-a775-4851-b196-00f1e9906143",
+      "name": "Create or update a contact",
+      "credentials": {
+        "hubspotAppToken": {
+          "id": "vtkhOBPNJOghHW2S",
+          "name": "HubSpot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "example@email.com",
+        "subject": "Nowy kontakt w HubSpot",
+        "message": "=Nowy kontakt zapisany w HubSpot. <br><br>\n\nAdres: {{ $('Gmail Trigger').item.json.From.includes('<') ? $('Gmail Trigger').item.json.From.split('<')[1].split('>')[0].trim() : $('Gmail Trigger').item.json.From.trim() }} <br>\nTemat oryginalnego maila: {{ $('Gmail Trigger').item.json.Subject }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1216,
+        -384
+      ],
+      "id": "5d4af855-31fa-48b9-817c-44bf95fa1404",
+      "name": "Send a message",
+      "webhookId": "341d87ed-0185-4c9e-a493-9cd20110f823",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Z9K9MpDgT01fWE9i",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a9e9f1fc-6fd2-4a21-92d4-551b1b3dbd0a",
+              "leftValue": "={{ $json.Subject }}",
+              "rightValue": "Nowy kontakt w HubSpot",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "9dbb4691-abfd-4571-aaf9-cb822d705357",
+              "leftValue": "={{ $json.Subject }}",
+              "rightValue": "Błąd w automatyzacji n8n",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -144,
+        -32
+      ],
+      "id": "7d0b5f33-eb9f-4cfe-bfe1-73194e93db85",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "content": "## Trigger + if \n**Gmail Trigger** wyłapuje każdy nowy mail.\n**If** odrzuca własne powiadomienia (maile z tematem „Nowy kontakt w HubSpot” i \"Błąd w automatyzacji n8n\").",
+        "height": 224,
+        "width": 400,
+        "color": "#A65E5E"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        -288
+      ],
+      "id": "563e1d4a-a596-42de-8507-460f9666fb2e",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Klasyfikacja treści (LLM)\nGemini czyta maila i przypisuje go do kategorii:\nWork / Packages / Personal / Other",
+        "height": 208,
+        "width": 288,
+        "color": "#B84747"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        48,
+        -320
+      ],
+      "id": "e989973c-f9e8-4430-aa83-846591539bce",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Tagi\nNa podstawie katergorii przypisywane są tagi.",
+        "height": 176,
+        "width": 208,
+        "color": "#A62B2B"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        368,
+        -576
+      ],
+      "id": "300256c2-5dbd-4958-94fe-6fc0c7e2bf07",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## HubSpot\nNadawca maila z kategorii work zostaje dodany/zaktualizowany jako kontakt w HubSpot.\nPo dodaniu nowego kontaktu zostaje wysłane powiadomienie email.",
+        "height": 176,
+        "width": 736,
+        "color": "#A01313"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        656,
+        -576
+      ],
+      "id": "17a6504f-ce1a-4ef7-9b21-ea409d78159b",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c3792e82-a10f-4cfb-abd0-0a64addeed0a",
+              "leftValue": "={{ $json.isNew }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        976,
+        -368
+      ],
+      "id": "c8c37d3f-5f96-4d5c-8050-2c92134dd404",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "content": "## Szkic odpowiedzi\nAI Agent (Gemini) z pamięcią i dostępem do skrzynki przygotowuje wstępny draft odpowiedzi w Gmailu dla maili z kategorii Personal.",
+        "width": 528,
+        "color": "#A01313"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        656,
+        -176
+      ],
+      "id": "54e36a6d-228f-4f06-a16d-d70cf33b2664",
+      "name": "Sticky Note4"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Email Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Classifier": {
+      "main": [
+        [
+          {
+            "node": "Add label to message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add label to message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add label to message2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add label to message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add label to message1": {
+      "main": [
+        []
+      ]
+    },
+    "Add label to message3": {
+      "main": [
+        []
+      ]
+    },
+    "Add label to message2": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Create a draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many messages in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add label to message": {
+      "main": [
+        [
+          {
+            "node": "Create or update a contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create or update a contact": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Email Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "UK7IxjepSDwkbRbp",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "b064266c-d107-468e-95a8-167fa7f64cc2",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "id": "cM8dXo8E0QzxGyFB",
+  "tags": []
+}
